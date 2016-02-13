@@ -30,6 +30,8 @@ var Button = React.createClass({
   },
 
   render() {
+    var touchableProps = {
+    };
     if (!this.props.disabled) {
       touchableProps.onPress = this._onPress;
       touchableProps.onPressIn = this._onPressIn;
