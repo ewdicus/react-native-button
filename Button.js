@@ -5,7 +5,7 @@ var {
   PropTypes,
   StyleSheet,
   Text,
-  TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } = React;
 
@@ -15,37 +15,49 @@ var systemButtonOpacity = 0.2;
 
 var Button = React.createClass({
   propTypes: {
-    ...TouchableOpacity.propTypes,
+    ...TouchableWithoutFeedback.propTypes,
     containerStyle: View.propTypes.style,
+    containerStylePressed: View.propTypes.style,
+    containerStyleDisabled: View.propTypes.style,
     disabled: PropTypes.bool,
     style: Text.propTypes.style,
+    stylePressed: Text.propTypes.style,
     styleDisabled: Text.propTypes.style,
   },
-  
+
+  getInitialState: function() {
+    return {pressed: false};
+  },
+
   render() {
-    var touchableProps = {
-      activeOpacity: this._computeActiveOpacity(),
-    };
     if (!this.props.disabled) {
-      touchableProps.onPress = this.props.onPress;
-      touchableProps.onPressIn = this.props.onPressIn;
-      touchableProps.onPressOut = this.props.onPressOut;
+      touchableProps.onPress = this._onPress;
+      touchableProps.onPressIn = this._onPressIn;
+      touchableProps.onPressOut = this._onPressOut;
       touchableProps.onLongPress = this.props.onLongPress;
     }
 
+    let {disabled} = this.props;
+    let style = [
+      this.props.containerStyle,
+      this.state.pressed ? this.props.containerStylePressed : null,
+      disabled ? this.props.containerStyleDisabled : null,
+    ];
+
     return (
-      <TouchableOpacity {...touchableProps} testID={this.props.testID} style={this.props.containerStyle}>          
+      <TouchableWithoutFeedback {...touchableProps} testID={this.props.testID} style={style}>
         {this._renderGroupedChildren()}
-      </TouchableOpacity>
+      </TouchableWithoutFeedback>
     );
   },
 
   _renderGroupedChildren() {
-    var {disabled} = this.props
+    var {disabled} = this.props;
     var style = [
       styles.text,
       disabled ? styles.disabledText : null,
       this.props.style,
+      this.state.pressed ? this.props.stylePressed : null,
       disabled ? this.props.styleDisabled : null,
     ];
 
@@ -67,13 +79,22 @@ var Button = React.createClass({
     }
   },
 
-  _computeActiveOpacity() {
-    if (this.props.disabled) {
-      return 1;
+  _onPress(){
+    if(this.props.onPress){
+      this.props.onPress.bind(this)();
     }
-    return this.props.activeOpacity != null ?
-      this.props.activeOpacity :
-      systemButtonOpacity;
+  },
+
+  _onPressIn(){
+    this.setState({
+      pressed: true
+    });
+  },
+
+  _onPressOut(){
+    this.setState({
+      pressed: false
+    });
   },
 });
 
@@ -92,6 +113,7 @@ var styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'center'
   },
 });
 
