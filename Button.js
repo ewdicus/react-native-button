@@ -65,7 +65,7 @@ var Button = React.createClass({
 
     var children = coalesceNonElementChildren(this.props.children, (children, index) => {
       return (
-        <Text key={index} style={style}>
+        <Text allowFontScaling={this.props.allowFontScaling} key={index} style={style}>
           {children}
         </Text>
       );
